@@ -1,0 +1,185 @@
+﻿@{
+    ViewData["Title"] = "Registro de Pago";
+}
+@model RegistroPago.Models.Pago
+
+
+<div class="row align-items-md-stretch " id="panel_titulo">
+    <div class="col-md-12">
+        <div class="h-100 colorVerde p-5 rounded-3">
+            <h2>Registro de comprobante</h2>
+            <p>XII Curso Virtual en Control y Monitoreo Visual</p>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="col-12">
+    <div class="card">
+        <div class="card-body " style="background-color: #E7E9EB">
+            <div class="row justify-content-between">
+                <div class="col pe-md-32 pe-md-120">
+                    <h4>Datos</h4>
+
+                    <p class="hp-p1-body">
+                        Llenar todos los datos de manera correcta.
+                    </p>
+                </div>
+
+                <div class="col hp-flex-none w-auto">
+                    <button type="button" class="btn btn-text btn-icon-only show-code-btn">
+                        <i class="ri-code-s-slash-line hp-text-color-black-80 hp-text-color-dark-30 lh-1" style="font-size: 16px;"></i>
+                    </button>
+                </div>
+
+                <div class="col-12 mt-16">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <form enctype="multipart/form-data" id="form_selector">
+
+                                <div id="errorContainer" class="text-danger"></div>
+
+                                <div class="form-group">
+                                    <div class="col-md-4">
+                                        <label asp-for="Cip" class="form-label">Nº CIP</label>
+                                        <input asp-for="Cip" class="form-control" type="number" required title="Ingrese su CIP" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="NombreApellido" class="form-label">Apellidos y Nombres</label>
+                                    <input asp-for="NombreApellido" type="text" class="form-control" oninput="convertToUppercase(this)" required title="Ingrese sus Apellidos y Nombres" />
+
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-4">
+                                        <label asp-for="FechaVoucher" class="form-label"> Fecha de depósito</label>
+                                        <input asp-for="FechaVoucher" class="form-control" asp-format="{0:yyyy-MM-ddTHH:mm}" required title="Ingrese la fecha de depósito" />
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label asp-for="ImageFile" class="form-label">Imagen del voucher y/o depósito</label>
+                                    <input asp-for="ImageFile" accept="image/jpeg" class="form-control" id="ImageFile" required title="Ingrese la imagen del voucher y/o depósito" />
+
+                                </div>
+
+                                <div class="form-group mt-4">
+
+                                    <button class="btn btn-success" id="btnguardar" type="submit">Guardar registro</button>
+                                </div>
+                            </form>
+
+
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+
+        function convertToUppercase(input) {
+            input.value = input.value.toUpperCase();
+        }
+
+        $(document).ready(function () {
+            $('form').submit(function (e) {
+                e.preventDefault();
+
+
+                var url = '@Url.Action("Create", "Home")'
+
+                var input = document.getElementById("ImageFile");
+                var files = input.files; //get files
+                var formData = new FormData(); //create form
+
+
+                formData.append("ImageFile", files[0]);
+                formData.append("Cip", $("#Cip").val());
+                formData.append("NombreApellido", $("#NombreApellido").val());
+                formData.append("FechaVoucher", $("#FechaVoucher").val());
+
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: formData,
+                    async: false,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+
+
+                         if (response.length > 0) {
+                            // Limpiar los mensajes de error anteriores
+                            $('#errorContainer').empty();
+
+                            // Agregar los nuevos mensajes de error al contenedor
+                            for (var i = 0; i < response.length; i++) {
+                                $('#errorContainer').append('<p>' + response[i] + '</p>');
+                             }
+
+                             //mensaje de error
+                             Swal.fire({
+                                 icon: 'warning',
+                                 title: 'warning',
+                                 text: 'Ha ocurrido un error al crear el registro.',
+                                 showConfirmButton: true
+                             });
+
+                         } else {
+
+                             // Mostrar la alerta de éxito
+                             Swal.fire({
+                                 icon: 'success',
+                                 title: '¡Éxito!',
+                                 text: 'El registro se creó correctamente.',
+                                 showConfirmButton: false,
+                                 timer: 2000
+                             }).then((result) => {
+                                 // Redireccionar a la página deseada después de la alerta
+                                 location.reload();
+                             });
+                         }
+
+
+
+
+                    },
+                    error: function (xhr, status, error) {
+
+                        console.log(error);
+
+             
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Ha ocurrido un error al crear el registro.',
+                            showConfirmButton: true
+                        });
+                    }
+                });
+
+
+
+            });
+        });
+
+    </script>
+}
+
+
+

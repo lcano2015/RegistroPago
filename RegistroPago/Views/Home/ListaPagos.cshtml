@@ -1,0 +1,185 @@
+﻿
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+@model RegistroPago.Models.PaginacionViewModel
+
+<style>
+    table {
+        /* Estilos generales de la tabla */
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    td {
+        /* Estilos de las celdas de la tabla */
+        padding: 8px;
+        border: 1px solid #ccc;
+    }
+
+        td img {
+            /* Estilos de las imágenes dentro de las celdas */
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+    .table .thead-dark th {
+        color: #fff;
+        background-color: #343a40;
+        border-color: #454d55;
+    }
+
+    .table thead th {
+        vertical-align: bottom;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    .table td, .table th {
+        padding: 0.75rem;
+        vertical-align: top;
+        border-top: 1px solid #dee2e6;
+    }
+
+    .form-inline {
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-flow: row wrap;
+        flex-flow: row wrap;
+        -ms-flex-align: center;
+        align-items: center;
+    }
+</style>
+<div class="row align-items-md-stretch " id="panel_titulo">
+    <div class="col-md-12">
+        <div class="h-100 p-5 colorVerde rounded-3">
+            <h2>Lista de Depósitos</h2>
+            <p>XII Curso Virtual en Control y Monitoreo Visual</p>
+
+            <div style="color: white; font-size: 13px;">•  El registro estará en proceso hasta que se valide el pago</div>
+        </div>
+    </div>
+
+</div>
+
+
+<div class="row">
+
+    <div class="col-md-6">
+
+        <form method="get" class="form-inline">
+
+            <div class="form-group mx-sm-3 mb-2">
+
+                <input type="text" name="searchTerm" class="form-control" value="@Model.TerminoBusqueda" placeholder="Buscar por Nº CIP..." />
+            </div>
+            <button type="submit" class="btn btn-primary mb-2">Buscar</button>
+
+        </form>
+    </div>
+    <div class="col-md-2 ">
+    </div>
+    <div class="col-md-4 ">
+
+        <form method="post" id="ExportarAExcel" asp-controller="Home" asp-action="ExportarAExcel">
+            <button type="submit" class="btn btn-primary mb-2 " style="float:right">Exportar a Excel</button>
+        </form>
+
+    </div>
+
+
+</div>
+
+<div class="row">
+
+    <div class="col-md-12">
+
+        <div class="table-responsive">
+            <table class="table">
+
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Nº CIP</th>
+                        <th>Apellidos y Nombres</th>
+                        <th>Fecha de comprobante</th>
+                        <th>Fecha de Registro</th>
+                        <th>Imagen de comprobante</th>
+                        <th>Proceso</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Pagos)
+                    {
+
+                    <tr>
+
+                        <td>@item.Cip</td>
+                        <td>@item.NombreApellido</td>
+                        <td>@item.FechaVoucher</td>
+                        <td>@item.FechaRegistro</td>
+
+                        <td>
+                            <div class="flex-shrink-0 me-3">
+                                <div>
+                                    <img src="@FileLocation.RetriveFileFromFolder@item.ImageName" alt="" asp-append-version="true" style="width: 50px; height: 50px; display: flex; max-width: 50px; ">
+                                </div>
+                            </div>
+                        </td>
+
+
+                        @if (item.Estado == 1)
+                            {
+                        <td>
+                            <span class="badge bg-warning text-uppercase">En proceso</span>
+                        </td>
+                            }
+                            else
+                            {
+                        <td>
+                            <span class="badge bg-success text-uppercase">Validado</span>
+                        </td>
+                            }
+
+                    </tr>
+
+                    }
+
+
+                </tbody>
+            </table>
+        </div>
+        <!-- Agregar controles de navegación -->
+        <nav aria-label="Paginación">
+            <ul class="pagination">
+                @if (Model.PaginaActual > 1)
+                {
+                <li class="page-item">
+                    <a class="page-link" href="?searchTerm=@Model.TerminoBusqueda&amp;pagina=1">Primera</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?searchTerm=@Model.TerminoBusqueda&amp;pagina=@(Model.PaginaActual - 1)">Anterior</a>
+                </li>
+                }
+                @for (int i = 1; i <= Model.TotalPaginas; i++)
+                {
+                <li class="page-item @(i == Model.PaginaActual ? "active" : "")">
+                    <a class="page-link" href="?searchTerm=@Model.TerminoBusqueda&amp;pagina=@i">@i</a>
+                </li>
+                }
+                @if (Model.PaginaActual < Model.TotalPaginas)
+                {
+                <li class="page-item">
+                    <a class="page-link" href="?searchTerm=@Model.TerminoBusqueda&amp;pagina=@(Model.PaginaActual + 1)">Siguiente</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?searchTerm=@Model.TerminoBusqueda&amp;pagina=@Model.TotalPaginas">Última</a>
+                </li>
+                }
+            </ul>
+        </nav>
+    </div>
+</div>

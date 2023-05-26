@@ -1,0 +1,16 @@
+﻿#panel_titulo {
+    margin-top: 35px;
+    margin-bottom: 35px;
+}
+.form-label {
+    font-weight: 600;
+}
+
+.separacion_button {
+    margin-top: 20px;
+}
+
+.colorVerde {
+    color: #fff !important;
+    background-color: #198754 !important;
+}
